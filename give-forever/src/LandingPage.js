@@ -11,6 +11,14 @@ export default function LandingPage(): React.ReactNode {
             <h2>A COS471 Project</h2>
         </div>
       </header>
+      <div class="main-text">
+  <p>Welcome to</p>
+</div>
+      <div class="center-text">
+  <p>DeVote</p>
+</div>
+
+
     </div>
   );
 };
