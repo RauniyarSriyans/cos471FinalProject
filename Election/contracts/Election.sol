@@ -22,6 +22,5 @@ contract Election {
         Candidate newCand = Candidate(candidatesCount, _name, 0);
         candidates[candidatesCount] = newCand;
         
-        
     }
 }
