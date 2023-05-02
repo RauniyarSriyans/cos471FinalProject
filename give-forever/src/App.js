@@ -48,7 +48,6 @@ function App(): React.ReactNode {
       <Routes>
       <Route exact path ="/" element={<LandingPage/>}/>
       
-      {/* <Route path="/profile" element={<SignUpModal />} /> */}
     </Routes>
    </div>
   );
