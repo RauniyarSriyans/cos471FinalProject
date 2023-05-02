@@ -1,52 +1,57 @@
-import './LandingPage.css';
-import LandingPage from '/Users/karimelbarbary/Desktop/cos471finalproject/give-forever/src/LandingPage';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-App = {
-  web3Provider: null,
-  contracts: {},
-  account: '0x0',
+import { useState, useEffect } from "react";
+import Election from "../build/contracts/Election.json";
+import TruffleContract from 'truffle-contract';
+import Web3 from "web3/dist/web3.min"
+import {Route, Routes, Router} from 'react-router-dom';
+import LandingPage from "./LandingPage"
 
-  init: function() {
-    return App.initWeb3();
-  },
+function App(): React.ReactNode {
 
-  initWeb3: function() {
-    if (typeof web3 !== 'undefined') {
-      // If a web3 instance is already provided by Meta Mask.
-      App.web3Provider = web3.currentProvider;
-      web3 = new Web3(web3.currentProvider);
+  const [account, setAccount] = useState(null);
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const web3 = await getWeb3();
+        const accounts = await web3.eth.getAccounts();
+        const electionContract = await getContract(web3);
+
+
+        setAccount(accounts[0]);
+ 
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    init();
+  }, []);
+
+  const getWeb3 = async () => {
+    if (typeof window.ethereum !== "undefined") {
+      const provider = window.ethereum;
+      await provider.enable();
+      return new Web3(provider);
     } else {
-      // Specify default instance if no web3 instance provided
-      App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-      web3 = new Web3(App.web3Provider);
+      return new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
     }
-    return App.initContract();
-  }, initContract: function() {
-    $.getJSON("Election.json", function(election) {
-      // Instantiate a new truffle contract from the artifact
-      App.contracts.Election = TruffleContract(election);
-      // Connect provider to interact with contract
-      App.contracts.Election.setProvider(App.web3Provider);
-
-      return App.render();
-    });
-  },
-
-  render: function() {
-    return (
-      <Router>
-          <Routes>
-            <Route exact path="/" element={<LandingPage />} />
-          </Routes>
-      </Router>
-    );
-  }
   };
-  
-  $(function() {
-    $(window).load(function() {
-      App.init();
-    });
-  });
-  
+
+  const getContract = async (web3) => {
+    const contract = TruffleContract(Election);
+    contract.setProvider(web3.currentProvider);
+    return contract.deployed();
+  };
+
+  return (
+    
+   <div>
+      <Routes>
+      <Route exact path ="/" element={<LandingPage/>}/>
+      
+      {/* <Route path="/profile" element={<SignUpModal />} /> */}
+    </Routes>
+   </div>
+  );
+}
+
 export default App;

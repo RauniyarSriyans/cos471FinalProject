@@ -2,25 +2,26 @@ pragma solidity >=0.4.22 <0.7.0;
 
 contract Election {
     // A candidate struct 
-    struct Candidate{
+    struct Candidate {
         uint id;
         string name;
         uint voteCount;
     }
 
     // a mapping of Candidate structs 
-    mapping(unint => Candidate) public candidates;
+    mapping(uint => Candidate) public candidates;
 
     // number of candidates
     uint public candidatesCount;
 
-    function Election () public {
-        
+    constructor () public {
+        addCandidate("Candidate 1");
+        addCandidate("Candidate 2");
     }
-    function addCandidate(string _name) private{
+
+    function addCandidate(string memory _name) private {
         candidatesCount++;
-        Candidate newCand = Candidate(candidatesCount, _name, 0);
+        Candidate memory newCand = Candidate(candidatesCount, _name, 0);
         candidates[candidatesCount] = newCand;
-        
     }
 }
