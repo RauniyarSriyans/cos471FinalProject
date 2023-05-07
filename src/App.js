@@ -1,23 +1,16 @@
-import { useState, useEffect } from "react";
-import Web3 from "web3"
-import Election from './contracts/Election.json';
-import {Route, Routes, Router} from 'react-router-dom';
-import LandingPage from "./LandingPage"
-import VoterDashboard from "./VoterDashboard"
+import { Routes, Route } from "react-router-dom";
+import React from "react";
+import LandingPage from "./LandingPage";
+import VoterDashboard from "./VoterDashboard";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-
-function App(): React.ReactNode {
-
+function App() {
   return (
-    
-   <div>
-      <Routes>
-      <Route exact path ="/" element={<LandingPage/>}/>
-      <Route exact path ="/VoterDashboard" element={<VoterDashboard/>}/>
+    <Routes>
+      <Route exact path="/dashboard" element={<VoterDashboard />} />
+      <Route exact path="/" element={<LandingPage />} />
     </Routes>
-   </div>
   );
 }
-
 
 export default App;
