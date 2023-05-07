@@ -1,4 +1,4 @@
-pragma solidity >=0.4.22 <0.7.0;
+pragma solidity ^0.8.19;
 
 contract Election {
     // A candidate struct 
@@ -9,18 +9,18 @@ contract Election {
     }
 
     // a mapping of Candidate structs 
-    mapping(unint => Candidate) public candidates;
+    mapping(uint => Candidate) public candidates;
 
     // number of candidates
     uint public candidatesCount;
 
-    function Election () public {
+    constructor () public {
         
     }
-    function addCandidate(string _name) private{
+
+    function addCandidate(string memory _name) public {
         candidatesCount++;
-        Candidate newCand = Candidate(candidatesCount, _name, 0);
-        candidates[candidatesCount] = newCand;
-        
+        Candidate memory newCand = Candidate(candidatesCount, _name, 0);
+        candidates[candidatesCount] = newCand;  
     }
 }

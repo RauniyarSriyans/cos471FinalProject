@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import Election from "../build/contracts/Election.json";
-import TruffleContract from 'truffle-contract';
+import TruffleContract from "truffle-contract";
 import Web3 from "web3";
-import {Route, Routes, Router} from 'react-router-dom';
+import { Route, Routes, Router } from "react-router-dom";
 
 function App() {
   const [account, setAccount] = useState(null);
-
 
   useEffect(() => {
     const init = async () => {
@@ -15,9 +14,7 @@ function App() {
         const accounts = await web3.eth.getAccounts();
         const electionContract = await getContract(web3);
 
-
         setAccount(accounts[0]);
- 
       } catch (error) {
         console.error(error);
       }
@@ -32,7 +29,9 @@ function App() {
       await provider.enable();
       return new Web3(provider);
     } else {
-      return new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+      return new Web3(
+        new Web3.providers.HttpProvider("http://localhost:7545")
+      );
     }
   };
 
@@ -42,13 +41,12 @@ function App() {
     return contract.deployed();
   };
 
-
   return (
     <Router>
-    <Routes>
-      <Route exact path="/" element={<LandingPage />} />
-    </Routes>
-</Router>
+      <Routes>
+        <Route exact path="/" element={<LandingPage />} />
+      </Routes>
+    </Router>
   );
 }
 
