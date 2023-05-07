@@ -12,6 +12,7 @@ export default function LandingPage(): React.ReactNode {
   const [isConnected, setIsConnected] = useState(false);
   const navigate = useNavigate();
   const handleConnect = () => {
+    let provider;
     
         /*
     if (window.ethereum) {
@@ -22,15 +23,18 @@ export default function LandingPage(): React.ReactNode {
       console.log("2");
     }
     else{*/
-    const provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
+   provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
   //}
+  if(!provider) {
+    console.error("No Ethereum or Local Provider Detected");
+    return;
+  }
+
     async function template(){
       const web3 = new Web3(provider);
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = Election.networks[networkId];
       const contract = new web3.eth.Contract(Election.abi, deployedNetwork.address);
-      console.log(contract);
-
       setState({web3:web3, contract: contract});
       setIsConnected(true);
       navigate('/VoterDashBoard');
@@ -38,14 +42,14 @@ export default function LandingPage(): React.ReactNode {
     provider && template();
   }
 
-  useEffect(()=> {
+  /*useEffect(()=> {
     const {contract} = state;
     async function test(){
       const data = await contract.methods.sayHello().call();
       console.log(data);
     }
     contract && test();
-  }, [state.contract]);
+  }, [state.contract]);*/
 
   
 
