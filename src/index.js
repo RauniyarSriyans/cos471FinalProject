@@ -1,20 +1,18 @@
-
-import React from 'react';
+import React from "react";
 import { createRoot } from "react-dom/client";
-import ReactDOM from 'react-dom/client';
+import ReactDOM from "react-dom/client";
 
-import App from './App';
+import App from "./App";
 
-import { BrowserRouter, HashRouter } from 'react-router-dom';
+import { BrowserRouter, HashRouter } from "react-router-dom";
 
 import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <HashRouter>
-    <App />
-
+      <App />
     </HashRouter>
   </React.StrictMode>
 );
@@ -23,4 +21,3 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
-
