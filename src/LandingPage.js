@@ -1,13 +1,18 @@
 import './LandingPage.css';
 import { useState, useEffect } from "react";
 import Web3 from "web3"
+import './App.js'
+import VoterDashboard from "./VoterDashboard";
+import {useNavigate } from 'react-router-dom';
 import Election from './contracts/Election.json';
 
 
 export default function LandingPage(): React.ReactNode {
   const [state, setState] = useState({web3:null, contract:null});
   const [isConnected, setIsConnected] = useState(false);
+  const navigate = useNavigate();
   const handleConnect = () => {
+    
         /*
     if (window.ethereum) {
       provider = window.ethereum;
@@ -24,8 +29,11 @@ export default function LandingPage(): React.ReactNode {
       const networkId = await web3.eth.net.getId();
       const deployedNetwork = Election.networks[networkId];
       const contract = new web3.eth.Contract(Election.abi, deployedNetwork.address);
+      console.log(contract);
+
       setState({web3:web3, contract: contract});
       setIsConnected(true);
+      navigate('/VoterDashBoard');
     } 
     provider && template();
   }
@@ -58,7 +66,7 @@ export default function LandingPage(): React.ReactNode {
   <p>DeVote</p>
 </div>
 <div>
-    <h1>Button</h1>
+
     {isConnected ? (
       <p>Placeholder for token</p>
     ) : (
