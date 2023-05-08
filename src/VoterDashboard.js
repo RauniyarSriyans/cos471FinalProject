@@ -1,7 +1,7 @@
 import "./App.js";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Election from "./contracts/Election.json";
+import Voting from "./contracts/Voting.json";
 import Web3 from "web3";
 
 export default function VoterDashboard() {
@@ -11,11 +11,10 @@ export default function VoterDashboard() {
   const [isConnected, setIsConnected] = useState(false);
 
   // State hooks to manage the list of elections, selected election, list of candidates, selected candidate, and voter information
-  const [elections, setElections] = useState([]);
-  const [selectedElection, setSelectedElection] = useState(null);
+  const [election, setElection] = useState(null);
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [voter, setVoter] = useState(null);
+  const [ssn, setSsn] = useState(null);
 
   // Function to connect to the Ethereum network and initialize the contract instance
   const connectWeb3 = async () => {
@@ -43,7 +42,7 @@ export default function VoterDashboard() {
       // Get the network ID to deploy the contract to the correct network
       const networkId = await web3.eth.net.getId();
       // Get the deployed network from the contract JSON
-      const deployedNetwork = Election.networks[networkId];
+      const deployedNetwork = Voting.networks[networkId];
       // If the contract isn't deployed to the current network, log an error message and return
       if (!deployedNetwork) {
         console.error(
@@ -53,7 +52,7 @@ export default function VoterDashboard() {
       }
       // Create a new contract instance using the web3 instance and the contract JSON
       const contract = new web3.eth.Contract(
-        Election.abi,
+        Voting.abi,
         deployedNetwork.address
       );
       // Update the state with the web3 and contract instances and set isConnected to true
@@ -66,69 +65,38 @@ export default function VoterDashboard() {
   };
 
   // Function to load the list of elections from the smart contract
-  const loadElections = async () => {
-    if (!contract) return;
-
+  async function loadElection() {
     try {
-      const numElections = await contract.methods
-        .getNumElections()
+      const name = await contract.methods.getElectionName().call();
+      const electionCandidates = await contract.methods
+        .getElectionCandidates()
         .call();
-      const electionList = [];
-      for (let i = 0; i < numElections; i++) {
-        const election = await contract.methods.getElection(i).call();
-        electionList.push(election);
-      }
-      setElections(electionList);
-    } catch (error) {
-      console.error(
-        "Error loading elections from the smart contract:",
-        error
-      );
-    }
-  };
+      const candidate1 = electionCandidates[0];
+      const candidate2 = electionCandidates[1];
+      const candidate3 = electionCandidates[2];
 
-  // Function to load the list of candidates for the selected election from the smart contract
-  const loadCandidates = async () => {
-    if (!contract || !selectedElection) return;
-
-    try {
-      const electionID = selectedElection.electionID;
-      const candidatesCount = selectedElection.candidates.length;
-      const candidates = [];
-
-      for (let i = 0; i < candidatesCount; i++) {
-        const candidate = selectedElection.candidates[i];
-        candidates.push(candidate);
-      }
-
-      setCandidates(candidates);
-    } catch (error) {
-      console.error(
-        "Error loading candidates from the smart contract:",
-        error
-      );
-    }
-  };
-
-  // Function to load the voter information from the smart contract
-  const loadVoter = async () => {
-    if (!contract || !web3) return;
-
-    try {
-      const accounts = await web3.eth.getAccounts();
-      const voterId = accounts[0];
-      const electionId = selectedElection?.id;
-      const voter = await contract.methods
-        .getVoter(electionId, voterId)
+      const electionResults = await contract.methods
+        .getElectionResults()
         .call();
-      setVoter(voter);
-    } catch (error) {
+      const candidate1Votes = electionResults[0];
+      const candidate2Votes = electionResults[1];
+      const candidate3Votes = electionResults[2];
+      setElection({
+        name,
+        candidates: [
+          { name: candidate1, votes: candidate1Votes },
+          { name: candidate2, votes: candidate2Votes },
+          { name: candidate3, votes: candidate3Votes },
+        ],
+      });
+      setCandidates([candidate1, candidate2, candidate3]);
+    } catch (err) {
       console.error(
-        "Error loading voter information from the smart contract:",
-        error
+        "Error loading election from the smart contract:",
+        err
       );
     }
-  };
+  }
 
   // Connect to the Ethereum network and initialize the contract instance on component mount
   useEffect(() => {
@@ -137,32 +105,21 @@ export default function VoterDashboard() {
 
   // Load the list of elections from the smart contract on component mount and whenever the contract instance changes
   useEffect(() => {
-    loadElections();
+    loadElection();
   }, [contract]);
 
-  // Load the list of candidates for the selected election from the smart contract whenever the selected election changes
-  useEffect(() => {
-    loadCandidates();
-  }, [selectedElection, contract]);
-
   // Load the voter information from the smart contract whenever the web3 instance or contract instance changes
-  useEffect(() => {
-    loadVoter();
-  }, [web3, contract]);
 
   const handleVote = async () => {
-    if (!contract || !selectedElection || selectedCandidate === null)
-      return;
+    if (!contract || !election || selectedCandidate === null) return;
 
     try {
       const accounts = await web3.eth.getAccounts();
-      const ssn = voter.ssn;
-      const electionID = selectedElection.electionID;
-      const optionIndex = selectedCandidate;
+      const ssn2send = web3.utils.utf8ToHex(ssn); // convert voter's SSN to bytes32 format
+      const optionIndex = selectedCandidate + 1; // candidates in the Voting contract are indexed from 1
       await contract.methods
-        .vote(ssn, electionID, optionIndex)
+        .vote(ssn2send, optionIndex)
         .send({ from: accounts[0] });
-      loadVoter();
     } catch (error) {
       console.error("Error voting:", error);
     }
@@ -186,20 +143,11 @@ export default function VoterDashboard() {
                 </div>
                 <div className="card-body">
                   <ul className="list-group">
-                    {elections.map((election) => (
-                      <li
-                        key={election.electionID}
-                        className={`list-group-item ${
-                          election.electionID ===
-                          selectedElection?.electionID
-                            ? "active"
-                            : ""
-                        }`}
-                        onClick={() => setSelectedElection(election)}
-                      >
+                    {election && (
+                      <li className="list-group-item">
                         {election.name}
                       </li>
-                    ))}
+                    )}
                   </ul>
                 </div>
               </div>
@@ -223,17 +171,6 @@ export default function VoterDashboard() {
                       </li>
                     ))}
                   </ul>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card mb-4">
-                <div className="card-header bg-primary text-white">
-                  <h5 className="mb-0">Voter Information</h5>
-                </div>
-                <div className="card-body">
-                  <p>Name: {voter?.name}</p>
-                  <p>Has Voted: {voter?.hasVoted ? "Yes" : "No"}</p>
                 </div>
               </div>
             </div>
