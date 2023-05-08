@@ -7,7 +7,8 @@ export const Register = (props) => {
       const [name, setName] = useState("");
       const [date, setDate] = useState("");
       const navigate = useNavigate();
-      const [errorMessage, setErrorMessage] = useState("");
+      const [errorMessage, setErrorMessage] = useState("")
+      const [showErrorMsg, setShowErrorMsg] = useState(false)
       const [ssn, setSSN] = useState("");
       const [web3, setWeb3] = useState(null);
       const [contract, setContract] = useState(null);
@@ -67,22 +68,45 @@ export const Register = (props) => {
       useEffect(() => {
         connectWeb3();
       }, []);
+      const failureCallBack = (error)=>{
+         setErrorMessage(error);
+         setShowErrorMsg(true);
+         console.log("error");
+        }
+        const successCallBack = ()=>{
+          console.log("success");
+          setShowErrorMsg(false);
+          setErrorMessage(null);
+          navigate("/dashboard");
+
+        }
     
       const handleSubmit = async (e) => {
         e.preventDefault();
+        let error = 0;
         const enteredSSN = e.target.ssn.value;
         const enteredName = e.target.name.value;
         const enteredDate = e.target.dob.value;
-        
+        if (!/^\d{3}-\d{2}-\d{4}$/.test(enteredSSN)) {
+            document.getElementById('ssn').placeholder = "Invalid SNN";
+            error = 1;
+        }
+        if (enteredName === ""){
+            document.getElementById('name').placeholder = "Name field cannot be empty";
+            error = 1;
+        }
+        if (enteredDate === "") {
+            document.getElementById('dob').placeholder = "Date of birth field cannot be empty";
+            error = 1;
+        }
         const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
         if (isRegistered) {
           setErrorMessage("An account with this SSN already exists. Please sign in.");
+          error = 1;
           console.log(errorMessage);
         }
-        else {
-          const register = await contract.methods.register(enteredName, enteredDate, enteredSSN).call();
-          navigate("/dashboard");
-        }
+
+        error !== 0 ? failureCallBack("Please fix errors above") : successCallBack()
 
       }
         
@@ -98,7 +122,7 @@ export const Register = (props) => {
             <button type = "submit">Sign up</button>
             {errorMessage && <p>{errorMessage}</p>}
         </form>
-        <button onClick = {() => props.onFormSwitch('login')}>Already have an account? Login here</button>
+        <p>Already have an account? <button onClick = {() => props.onFormSwitch('login')}>Login here</button></p>
         </>
     );
 }

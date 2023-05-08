@@ -6,7 +6,8 @@ import Voting from "./contracts/Voting.json";
 import Web3 from 'web3'
 export const Login = (props) => {
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("")
+  const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [ssn, setSSN] = useState("");
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
@@ -66,20 +67,36 @@ export const Login = (props) => {
   useEffect(() => {
     connectWeb3();
   }, []);
+  const failureCallBack = (error)=>{
+    setErrorMessage(error);
+    setShowErrorMsg(true);
+    console.log("error");
+   }
+   const successCallBack = ()=>{
+     console.log("success");
+     setShowErrorMsg(false);
+     setErrorMessage(null);
+     navigate("/dashboard");
+
+   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(ssn);
-    const enteredPass = e.target.ssn.value;
-    
-      const isRegistered = await contract.methods.hasRegistered(enteredPass).call();
+    let error = 0;
+    const enteredSSN = e.target.ssn.value;
+    if (!/^\d{3}-\d{2}-\d{4}$/.test(enteredSSN)) {
+        document.getElementById('ssn').classList.add("error");
+        document.getElementById('ssn').placeholder = "Invalid SNN";
+        error = 1;
+    }
+      const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
       if (!isRegistered) {
         setErrorMessage("Unregistered or invalid SSN");
+        error = 1;
         console.log(errorMessage);
       }
-      else {
-        navigate("/dashboard");
-      }
+      error !== 0 ? failureCallBack("Please fix errors above") : successCallBack()
 
   };
   
@@ -92,7 +109,8 @@ export const Login = (props) => {
             <button type = "submit">Log In</button>
             {errorMessage && <p>{errorMessage}</p>}
         </form>
-        <button onClick = {() => props.onFormSwitch('register')}> Don't have an account? Register here</button>
+       
+        <p>Don't have an account? <button onClick = {() => props.onFormSwitch('register')}> Register here</button> </p>
         </>
     );
 }
