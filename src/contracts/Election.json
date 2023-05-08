@@ -1678,7 +1678,7 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.6.12+commit.27d51765.Emscripten.clang"
+    "version": "0.8.0"
   },
   "networks": {
     "5777": {
