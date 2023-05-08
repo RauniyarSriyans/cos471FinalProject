@@ -23,11 +23,14 @@ export default function VoterDashboard() {
     // Check if the user has MetaMask or another Ethereum provider installed in their browser
     if (window.ethereum) {
       provider = window.ethereum;
+      console.log("here1");
     } else {
       // Use a local development network as a fallback
       provider = new Web3.providers.HttpProvider(
         "http://127.0.0.1:7545"
+        
       );
+      console.log("here2");
     }
 
     // If no provider is found, log an error message and return
@@ -68,6 +71,7 @@ export default function VoterDashboard() {
   async function loadElection() {
     try {
       const name = await contract.methods.getElectionName().call();
+      console.log(name);
       const electionCandidates = await contract.methods
         .getElectionCandidates()
         .call();
