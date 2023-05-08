@@ -84,4 +84,8 @@ contract Voting {
         bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
         return voters[hashedSSN].ssn == hashedSSN;
     }
+
+    function getElectionName() public view returns(string memory) {
+        return electionName;
+    }
 }
