@@ -74,13 +74,37 @@ export default function LandingPage() {
       </header>
       <main className="flex-grow-1 d-flex justify-content-center align-items-center">
         <div className="text-center">
-          <h1 className="display-2">DeVote</h1>
-          <p className="lead mb-5">Welcome to DeVote</p>
+          <h1 className="display-1 font-weight-bold" >DeVote</h1>
+          <h2 className="lead mb-5">Welcome to DeVote</h2>
+          <br></br>
+          <p className="display-15 font-weight-bold mx-3">Introducing DeVote, a decentralized voting platform that 
+          leverages blockchain technology to provide a secure and transparent voting process. With DeVote, 
+          users can participate in democratic decision-making without the need for intermediaries or centralized 
+          institutions. Built on the Ethereum blockchain, DeVote uses smart contracts to automate the voting 
+          process, ensuring that each vote is recorded accurately and transparently. This eliminates the 
+          potential for fraud or manipulation, as each vote is verified by a decentralized network of nodes.</p>
+          <br></br>
+          <br></br>
+          <h3>For verification, please connect to a Metamask account and have the following information with you.</h3>
+          <ol class="list-group-numbered">
+            <li class="list-group-item">
+              Name
+            </li>
+            <li class="list-group-item">
+              SSN/ITIN Number
+            </li>
+            <li class="list-group-item">
+              Date of Birth
+            </li>
+          </ol>
+          <br></br>
+          <br></br>
+          <br></br>
           {isConnected ? (
             <p>Placeholder for token</p>
           ) : (
             <button className="btn btn-lg btn-success" onClick={handleNav}>
-              Login/Register
+              Connect
             </button>
           )}
         </div>
