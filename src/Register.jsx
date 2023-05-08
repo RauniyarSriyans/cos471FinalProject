@@ -73,20 +73,19 @@ export const Register = (props) => {
         const enteredSSN = e.target.ssn.value;
         const enteredName = e.target.name.value;
         const enteredDate = e.target.dob.value;
-        const register = await contract.methods.register(enteredName, enteredDate, enteredSSN).call();
+        
         const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
         if (isRegistered) {
           setErrorMessage("An account with this SSN already exists. Please sign in.");
           console.log(errorMessage);
         }
         else {
+          const register = await contract.methods.register(enteredName, enteredDate, enteredSSN).call();
           navigate("/dashboard");
         }
 
       }
         
-          
-    
     return (
         <>
         <form onSubmit={handleSubmit}>
