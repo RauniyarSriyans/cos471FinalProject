@@ -27,8 +27,11 @@ export default function LandingPage() {
         // Get the contract instance
         const networkId = await web3.eth.net.getId();
         const deployedNetwork = Voting.networks[networkId];
+
         if (!deployedNetwork) {
-          throw new Error(`Contract not deployed on network with id ${networkId}`);
+          throw new Error(
+            `Contract not deployed on network with id ${networkId}`
+          );
         }
         const contract = new web3.eth.Contract(
           Voting.abi,

@@ -24,11 +24,19 @@ contract Voting {
         string dateOfBirth
     );
 
-    event VoteCast(
-        bytes32 indexed ssn,
-        uint indexed optionIndex
-    );
+    event VoteCast(bytes32 indexed ssn, uint indexed optionIndex);
     event ElectionEnded(bytes32 indexed electionID);
+
+    constructor() {
+        electionName = "Example Election";
+        candidate1 = "Candidate A";
+        candidate2 = "Candidate B";
+        candidate3 = "Candidate C";
+
+        candidate1Votes = 0;
+        candidate2Votes = 0;
+        candidate3Votes = 0;
+    }
 
     function register(
         string memory _name,
@@ -41,19 +49,11 @@ contract Voting {
             voters[hashedSSN].ssn != hashedSSN,
             "Voter already registered."
         );
-        voters[hashedSSN] = Voter(
-            hashedName,
-            _dateOfBirth,
-            hashedSSN,
-            false
-        );
+        voters[hashedSSN] = Voter(hashedName, _dateOfBirth, hashedSSN, false);
         emit VoterRegistered(hashedSSN, hashedName, _dateOfBirth);
     }
 
-    function vote(
-        string memory _ssn,
-        uint _optionIndex
-    ) public {
+    function vote(string memory _ssn, uint _optionIndex) public {
         bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
         require(voters[hashedSSN].ssn == hashedSSN, "Voter not registered.");
         require(!voters[hashedSSN].hasVoted, "Voter has already voted.");
@@ -62,9 +62,9 @@ contract Voting {
             "Invalid candidate."
         );
         voters[hashedSSN].hasVoted = true;
-        if(_optionIndex == 1) {
+        if (_optionIndex == 1) {
             candidate1Votes++;
-        } else if(_optionIndex == 2) {
+        } else if (_optionIndex == 2) {
             candidate2Votes++;
         } else {
             candidate3Votes++;
@@ -76,16 +76,20 @@ contract Voting {
         return (candidate1Votes, candidate2Votes, candidate3Votes);
     }
 
-    function getElectionCandidates() public view returns (string memory, string memory, string memory) {
+    function getElectionCandidates()
+        public
+        view
+        returns (string memory, string memory, string memory)
+    {
         return (candidate1, candidate2, candidate3);
     }
 
-    function hasRegistered(string memory _ssn) public view returns(bool) {
+    function hasRegistered(string memory _ssn) public view returns (bool) {
         bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
         return voters[hashedSSN].ssn == hashedSSN;
     }
 
-    function getElectionName() public view returns(string memory) {
+    function getElectionName() public view returns (string memory) {
         return electionName;
     }
 }
