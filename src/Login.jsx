@@ -67,8 +67,7 @@ export const Login = (props) => {
   useEffect(() => {
     connectWeb3();
   }, []);
-  const failureCallBack = (error)=>{
-    setErrorMessage(error);
+  const failureCallBack = ()=>{
     setShowErrorMsg(true);
     console.log("error");
    }
@@ -85,18 +84,19 @@ export const Login = (props) => {
     console.log(ssn);
     let error = 0;
     const enteredSSN = e.target.ssn.value;
+    const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
+
     if (!/^\d{3}-\d{2}-\d{4}$/.test(enteredSSN)) {
-        document.getElementById('ssn').classList.add("error");
-        document.getElementById('ssn').placeholder = "Invalid SNN";
+        setErrorMessage("Invalid SSN")
         error = 1;
+        
     }
-      const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
-      if (!isRegistered) {
-        setErrorMessage("Unregistered or invalid SSN");
+    else if (!isRegistered) {
+        setErrorMessage("Unregistered SSN. Please sign up");
         error = 1;
         console.log(errorMessage);
       }
-      error !== 0 ? failureCallBack("Please fix errors above") : successCallBack()
+      error !== 0 ? failureCallBack() : successCallBack()
 
   };
   
