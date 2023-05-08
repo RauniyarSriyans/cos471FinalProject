@@ -6,42 +6,34 @@ contract Voting {
         bytes32 name;
         string dateOfBirth;
         bytes32 ssn;
-        address addr;
         bool hasVoted;
     }
 
-    struct electionA {
-        string name;
-        string[] candidates;
-        mapping(uint => uint) voteCounts;
-        bool active;
-    }
-
     mapping(bytes32 => Voter) public voters;
-    mapping(bytes32 => electionA) public elections;
+    string public electionName;
+    string public candidate1;
+    string public candidate2;
+    string public candidate3;
+    uint public candidate1Votes;
+    uint public candidate2Votes;
+    uint public candidate3Votes;
 
     event VoterRegistered(
         bytes32 indexed ssn,
         bytes32 name,
         string dateOfBirth
     );
+
     event VoteCast(
         bytes32 indexed ssn,
-        bytes32 indexed electionID,
         uint indexed optionIndex
-    );
-    event ElectionCreated(
-        bytes32 indexed electionID,
-        string name,
-        string[] options
     );
     event ElectionEnded(bytes32 indexed electionID);
 
     function register(
         string memory _name,
         string memory _dateOfBirth,
-        string memory _ssn,
-        address addr
+        string memory _ssn
     ) public {
         bytes32 hashedName = keccak256(abi.encodePacked(_name));
         bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
@@ -53,7 +45,6 @@ contract Voting {
             hashedName,
             _dateOfBirth,
             hashedSSN,
-            addr,
             false
         );
         emit VoterRegistered(hashedSSN, hashedName, _dateOfBirth);
@@ -61,57 +52,36 @@ contract Voting {
 
     function vote(
         string memory _ssn,
-        bytes32 _electionID,
         uint _optionIndex
     ) public {
         bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
         require(voters[hashedSSN].ssn == hashedSSN, "Voter not registered.");
         require(!voters[hashedSSN].hasVoted, "Voter has already voted.");
-        require(elections[_electionID].active, "Election is not active.");
         require(
-            _optionIndex < elections[_electionID].candidates.length,
-            "Invalid option index."
+            _optionIndex == 1 || _optionIndex == 2 || _optionIndex == 3,
+            "Invalid candidate."
         );
         voters[hashedSSN].hasVoted = true;
-        elections[_electionID].voteCounts[_optionIndex]++;
-        emit VoteCast(hashedSSN, _electionID, _optionIndex);
-    }
-
-    function createElection(
-        string memory _name,
-        string[] memory _options
-    ) public returns (bytes32) {
-        bytes32 electionID = keccak256(
-            abi.encodePacked(_name, block.timestamp)
-        );
-        require(!elections[electionID].active, "Election already exists.");
-        electionA storage newElection = elections[electionID];
-        newElection.name = _name;
-        newElection.candidates = _options;
-        for (uint i = 0; i < _options.length; i++) {
-            newElection.voteCounts[i] = 0;
+        if(_optionIndex == 1) {
+            candidate1Votes++;
+        } else if(_optionIndex == 2) {
+            candidate2Votes++;
+        } else {
+            candidate3Votes++;
         }
-        newElection.active = true;
-        emit ElectionCreated(electionID, _name, _options);
-        return electionID;
+        emit VoteCast(hashedSSN, _optionIndex);
     }
 
-    function endElection(bytes32 _electionID) public {
-        require(elections[_electionID].active, "Election is not active.");
-        elections[_electionID].active = false;
-        emit ElectionEnded(_electionID);
+    function getElectionResults() public view returns (uint, uint, uint) {
+        return (candidate1Votes, candidate2Votes, candidate3Votes);
     }
 
-    function getElectionResults(
-        bytes32 _electionID
-    ) public view returns (uint[] memory) {
-        require(!elections[_electionID].active, "Election is still active.");
-        uint[] memory results = new uint[](
-            elections[_electionID].candidates.length
-        );
-        for (uint i = 0; i < elections[_electionID].candidates.length; i++) {
-            results[i] = elections[_electionID].voteCounts[i];
-        }
-        return results;
+    function getElectionCandidates() public view returns (string memory, string memory, string memory) {
+        return (candidate1, candidate2, candidate3);
+    }
+
+    function hasRegistered(string memory _ssn) public view returns(bool) {
+        bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
+        return voters[hashedSSN].ssn == hashedSSN;
     }
 }
