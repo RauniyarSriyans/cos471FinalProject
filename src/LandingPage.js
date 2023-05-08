@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
-import Election from "./contracts/Election.json";
+import Voting from "./contracts/Voting.json";
 import VoterDashboard from "./VoterDashboard";
 
 export default function LandingPage() {
@@ -13,51 +13,40 @@ export default function LandingPage() {
   // The useNavigate hook from react-router-dom to navigate to the VoterDashboard component
   const navigate = useNavigate();
 
-  // Function to handle connecting to the Ethereum network
-/*   const handleConnect = async () => {
-    let provider;
-
-    // Check if the user has MetaMask or another Ethereum provider installed in their browser
+  // function to connect to metamask
+  const handleConnect = async () => {
+    // Check if the MetaMask extension is installed
     if (window.ethereum) {
-      provider = window.ethereum;
-    } else {
-      // Use a local development network as a fallback
-      provider = new Web3.providers.HttpProvider("http://127.0.0.1:7545");
-    }
-
-    // If no provider is found, log an error message and return
-    if (!provider) {
-      console.error("No Ethereum provider detected.");
-      return;
-    }
-
-    try {
-      // Create a new web3 instance using the provider
-      const web3 = new Web3(provider);
-      // Get the network ID to deploy the contract to the correct network
-      const networkId = await web3.eth.net.getId();
-      // Get the deployed network from the contract JSON
-      const deployedNetwork = Election.networks[networkId];
-      // If the contract isn't deployed to the current network, log an error message and return
-      if (!deployedNetwork) {
-        console.error(`Contract not deployed to network with ID ${networkId}`);
-        return;
+      try {
+        // Request account access if needed
+        await window.ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        // Create a new web3 instance using the provider
+        const web3 = new Web3(window.ethereum);
+        // Get the contract instance
+        const networkId = await web3.eth.net.getId();
+        const deployedNetwork = Voting.networks[networkId];
+        if (!deployedNetwork) {
+          throw new Error(`Contract not deployed on network with id ${networkId}`);
+        }
+        const contract = new web3.eth.Contract(
+          Voting.abi,
+          deployedNetwork.address
+        );
+        // Update state with the web3 and contract instances, and set isConnected to true
+        setWeb3(web3);
+        setContract(contract);
+        setIsConnected(true);
+      } catch (err) {
+        // Handle error while connecting
+        console.error(err);
       }
-      // Create a new contract instance using the web3 instance and the contract JSON
-      const contract = new web3.eth.Contract(
-        Election.abi,
-        deployedNetwork.address
-      );
-      // Update the state with the web3 and contract instances and set isConnected to true
-      setWeb3(web3);
-      setContract(contract);
-      setIsConnected(true);
-      // Navigate to the VoterDashboard component
-      navigate("/VoterDashBoard");
-    } catch (error) {
-      console.error("Error connecting to the Ethereum network:", error);
+    } else {
+      // Handle error if MetaMask extension is not installed
+      alert("Please install MetaMask!");
     }
-  }; */
+  };
 
   const handleNav = async () => {
     navigate("/login");
@@ -74,36 +63,47 @@ export default function LandingPage() {
       </header>
       <main className="flex-grow-1 d-flex justify-content-center align-items-center">
         <div className="text-center">
-          <h1 className="display-1 font-weight-bold" >DeVote</h1>
+          <h1 className="display-1 font-weight-bold">DeVote</h1>
           <h2 className="lead mb-5">Welcome to DeVote</h2>
           <br></br>
-          <p className="display-15 font-weight-bold mx-3">Introducing DeVote, a decentralized voting platform that 
-          leverages blockchain technology to provide a secure and transparent voting process. With DeVote, 
-          users can participate in democratic decision-making without the need for intermediaries or centralized 
-          institutions. Built on the Ethereum blockchain, DeVote uses smart contracts to automate the voting 
-          process, ensuring that each vote is recorded accurately and transparently. This eliminates the 
-          potential for fraud or manipulation, as each vote is verified by a decentralized network of nodes.</p>
+          <p className="display-15 font-weight-bold mx-3">
+            Introducing DeVote, a decentralized voting platform that
+            leverages blockchain technology to provide a secure and
+            transparent voting process. With DeVote, users can
+            participate in democratic decision-making without the need
+            for intermediaries or centralized institutions. Built on the
+            Ethereum blockchain, DeVote uses smart contracts to automate
+            the voting process, ensuring that each vote is recorded
+            accurately and transparently. This eliminates the potential
+            for fraud or manipulation, as each vote is verified by a
+            decentralized network of nodes.
+          </p>
           <br></br>
           <br></br>
-          <h3>For verification, please connect to a Metamask account and have the following information with you.</h3>
+          <h3>
+            For verification, please connect to a Metamask account and
+            have the following information with you.
+          </h3>
           <ol class="list-group-numbered">
-            <li class="list-group-item">
-              Name
-            </li>
-            <li class="list-group-item">
-              SSN/ITIN Number
-            </li>
-            <li class="list-group-item">
-              Date of Birth
-            </li>
+            <li class="list-group-item">Name</li>
+            <li class="list-group-item">SSN/ITIN Number</li>
+            <li class="list-group-item">Date of Birth</li>
           </ol>
           <br></br>
           <br></br>
           <br></br>
           {isConnected ? (
-            <p>Placeholder for token</p>
+            <button
+              className="btn btn-lg btn-primary margin-auto"
+              onClick={handleNav}
+            >
+              Signup/Login
+            </button>
           ) : (
-            <button className="btn btn-lg btn-success" onClick={handleNav}>
+            <button
+              className="btn btn-lg btn-success margin-auto"
+              onClick={handleConnect}
+            >
               Connect
             </button>
           )}
@@ -114,6 +114,4 @@ export default function LandingPage() {
       </footer>
     </div>
   );
-  
-  
 }

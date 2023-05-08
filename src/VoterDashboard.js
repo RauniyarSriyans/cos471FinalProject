@@ -233,7 +233,6 @@ export default function VoterDashboard() {
                 </div>
                 <div className="card-body">
                   <p>Name: {voter?.name}</p>
-                  <p>SSN: {voter?.ssn}</p>
                   <p>Has Voted: {voter?.hasVoted ? "Yes" : "No"}</p>
                 </div>
               </div>
