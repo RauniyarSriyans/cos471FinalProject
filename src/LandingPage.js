@@ -39,7 +39,9 @@ export default function LandingPage() {
       console.log(elecRes);
       const elecCand = await contract.methods.getElectionCandidates().call();
       console.log(elecCand);
-      //console.log(await contract.methods.register("Karim", "06/08/2002", "920243739").send({from: accounts[0]}));
+      console.log(await contract.methods.register("Karim", "06/08/2002", "920243739").send({gas: 3000000, from: accounts[0]}));
+      console.log(await contract.methods.vote("920243739", 1).send({gas: 3000000, from: accounts[0]}))
+      console.log(await contract.methods.getElectionResults().call());
       const hasReg = await contract.methods.hasRegistered("920243739").call();
       console.log(hasReg);
     }
