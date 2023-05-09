@@ -28,10 +28,10 @@ contract Voting {
     event ElectionEnded(bytes32 indexed electionID);
 
     constructor() {
-        electionName = "Example Election";
-        candidate1 = "Candidate A";
-        candidate2 = "Candidate B";
-        candidate3 = "Candidate C";
+        electionName = "US Presidential Election 2023";
+        candidate1 = "Joe Biden";
+        candidate2 = "Donald Trump";
+        candidate3 = "Kanye West";
 
         candidate1Votes = 0;
         candidate2Votes = 0;
@@ -91,5 +91,10 @@ contract Voting {
 
     function getElectionName() public view returns (string memory) {
         return electionName;
+    }
+
+    function hasVoted(string memory _ssn) public view returns (bool) {
+        bytes32 hashedSSN = keccak256(abi.encodePacked(_ssn));
+        return voters[hashedSSN].hasVoted;
     }
 }

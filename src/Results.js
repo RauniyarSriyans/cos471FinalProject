@@ -8,11 +8,11 @@ export default function Results() {
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [candidate1Votes, setCandidate1Votes] = useState(null);
-  const [candidate2Votes, setCandidate2Votes] = useState(null);
-  const [candidate3Votes, setCandidate3Votes] = useState(null);
+  const [candidatesVotes, setCandidatesVotes] = useState([]);
+  const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
 
   // Connect to the Ethereum network and initialize the contract instance on component mount
   useEffect(() => {
@@ -79,9 +79,11 @@ export default function Results() {
         const results = await contract.methods
           .getElectionResults()
           .call();
-        setCandidate1Votes(results[0]);
-        setCandidate2Votes(results[1]);
-        setCandidate3Votes(results[2]);
+        setCandidatesVotes(results);
+        const results1 = await contract.methods
+          .getElectionCandidates()
+          .call();
+        setCandidates(results1);
         setLoading(false);
       } catch (error) {
         setError("Error loading election results.");
@@ -92,6 +94,12 @@ export default function Results() {
 
     loadResults();
   }, [contract]);
+
+
+  const handleLogout = async () => {
+    localStorage.removeItem("ssn");
+    navigate("/");
+  };
 
   return (
     <div className="bg-light d-flex flex-column min-vh-100">
@@ -108,17 +116,23 @@ export default function Results() {
               <div className="card-body">
                 <h5 className="card-title">Election Results</h5>
                 <p className="card-text">
-                  Candidate 1: {candidate1Votes} votes
+                  {candidates[0]}: {candidatesVotes[0]} votes
                 </p>
                 <p className="card-text">
-                  Candidate 2: {candidate2Votes} votes
+                  {candidates[1]}: {candidatesVotes[1]} votes
                 </p>
                 <p className="card-text">
-                  Candidate 3: {candidate3Votes} votes
+                  {candidates[2]}: {candidatesVotes[2]} votes
                 </p>
-                <a href="/dashboard" className="btn btn-primary">
+                <button onClick={() => {navigate("/")}} className="btn btn-primary mr-9"
+                style={{margin: "10px"}}>
                   Return to Dashboard
-                </a>
+                </button>
+                <button onClick={handleLogout} className="btn btn-primary ml-9"
+                style={{margin: "10px"}}>
+                  Log out
+                </button>
+
               </div>
             </div>
           </div>

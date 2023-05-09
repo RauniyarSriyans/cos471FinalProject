@@ -8,13 +8,11 @@ export default function VoterDashboard() {
   const navigate = useNavigate();
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-
+  const [hasVoted, setHasVoted] = useState(false);
   // State hooks to manage the list of elections, selected election, list of candidates, selected candidate, and voter information
   const [election, setElection] = useState(null);
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [ssn, setSsn] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   // Function to load the list of elections from the smart contract
   async function loadElection() {
@@ -94,7 +92,6 @@ export default function VoterDashboard() {
         // Update the state with the web3 and contract instances and set isConnected to true
         setWeb3(web3);
         setContract(contract);
-        setIsConnected(true);
       } catch (err) {
         // If an error occurs, log it and return
         console.error(err);
@@ -110,6 +107,25 @@ export default function VoterDashboard() {
     loadElection();
   }, [contract]);
 
+  useEffect(() => {
+    async function loadHasVoted() {
+      if (!contract) return;
+      if (localStorage.getItem("ssn") === null) return;
+      try {
+        const hasVoted = await contract.methods
+          .hasVoted(localStorage.getItem("ssn"))
+          .call();
+        setHasVoted(hasVoted);
+      } catch (err) {
+        console.error(
+          "Error loading voter information from the smart contract:",
+          err
+        );
+      }
+      
+    }
+    loadHasVoted();
+  }, [contract]);
   // Load the voter information from the smart contract whenever the web3 instance or contract instance changes
 
   const handleVote = async () => {
@@ -130,6 +146,11 @@ export default function VoterDashboard() {
       setErrorMessage("You have already voted for this election.");
       console.error("Error submitting vote:", err);
     }
+  };
+
+  const handleLogout = async () => {
+    localStorage.removeItem("ssn");
+    navigate("/");
   };
 
   return (
@@ -187,12 +208,22 @@ export default function VoterDashboard() {
                   <h5 className="mb-0">Vote</h5>
                 </div>
                 <div className="card-body">
-                  <button
-                    onClick={handleVote}
-                    className="btn btn-primary"
-                  >
-                    Submit Vote
-                  </button>
+                {hasVoted && (
+                    <button onClick={() => navigate("/results")} className="btn btn-primary"
+                    style={{margin: "10px"}}>
+                      Results
+                    </button>
+                  ) }
+                {!hasVoted && (
+                    <button onClick={handleVote} className="btn btn-primary"
+                    style={{margin: "10px"}}>
+                      Submit Vote
+                    </button>
+                  )}
+                <button onClick={handleLogout} className="btn btn-primary"
+                style={{margin: "10px"}}>
+                  Log out
+                </button>
                 </div>
               </div>
             </div>
@@ -212,5 +243,7 @@ export default function VoterDashboard() {
         <p>&copy; 2023 DeVote. All rights reserved.</p>
       </footer>
     </div>
+
   );
 }
+
