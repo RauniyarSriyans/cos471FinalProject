@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import Election from "./contracts/Voting.json";
 import VoterDashboard from "./VoterDashboard";
+<<<<<<< HEAD
 import GetWeb3 from "./GetWeb3";
 
 export default function LandingPage() {
@@ -10,6 +11,14 @@ export default function LandingPage() {
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
   const [accounts, setAccounts] = useState([]);
+=======
+import {getWeb3} from "./GetWeb3"
+
+export default function LandingPage() {
+  // State hooks to manage the web3 instance, contract instance, and connection status
+  const [state, setState] = useState({web3:null, contract: null, accounts: []});
+
+>>>>>>> b0ea8a44de5bfd88d6eec564f213dd9e64bd4892
   const [isConnected, setIsConnected] = useState(false);
 
   // The useNavigate hook from react-router-dom to navigate to the VoterDashboard component

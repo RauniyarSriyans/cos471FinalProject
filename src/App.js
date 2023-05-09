@@ -4,11 +4,10 @@ import LandingPage from "./LandingPage";
 import VoterDashboard from "./VoterDashboard";
 import Results from "./Results";
 
+
 import Login from "./Login"
 import "bootstrap/dist/css/bootstrap.min.css";
 import ElectionResults from "./ElectionResults";
-
-
 
 
 function App() {

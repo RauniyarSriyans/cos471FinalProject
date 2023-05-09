@@ -153,7 +153,6 @@ export default function VoterDashboard() {
                 </div>
               </div>
             </div>
-
             <div className="col-md-4">
               <div className="card mb-4">
                 <div className="card-header bg-primary text-white">
