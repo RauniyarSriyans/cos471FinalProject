@@ -95,6 +95,12 @@ export default function Results() {
 
   return (
     <div className="bg-light d-flex flex-column min-vh-100">
+      <header className="bg-success text-white">
+        <div className="container d-flex justify-content-between align-items-center py-3">
+          <h2 className="mb-0">DeVote</h2>
+          <h2 className="mb-0">A COS471 Project</h2>
+        </div>
+      </header>
       <main className="container flex-fill">
         <div className="row justify-content-center">
           <div className="col-md-6">

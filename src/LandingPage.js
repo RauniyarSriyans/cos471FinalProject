@@ -1,58 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
-import Voting from "./contracts/Voting.json";
+import Election from "./contracts/Voting.json";
 import VoterDashboard from "./VoterDashboard";
+import GetWeb3 from "./GetWeb3";
 
 export default function LandingPage() {
   // State hooks to manage the web3 instance, contract instance, and connection status
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
+  const [accounts, setAccounts] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
 
   // The useNavigate hook from react-router-dom to navigate to the VoterDashboard component
   const navigate = useNavigate();
 
-  // function to connect to metamask
+  // function to connect to metamask and keep user signed in
   const handleConnect = async () => {
-    // Check if the MetaMask extension is installed
-    if (window.ethereum) {
-      try {
-        // Request account access if needed
-        await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        // Create a new web3 instance using the provider
-        const web3 = new Web3(window.ethereum);
-        // Get the contract instance
-        const networkId = await web3.eth.net.getId();
-        const deployedNetwork = Voting.networks[networkId];
-
-        if (!deployedNetwork) {
-          throw new Error(
-            `Contract not deployed on network with id ${networkId}`
-          );
-        }
-        const contract = new web3.eth.Contract(
-          Voting.abi,
-          deployedNetwork.address
-        );
-        // Update state with the web3 and contract instances, and set isConnected to true
-        setWeb3(web3);
-        setContract(contract);
-        setIsConnected(true);
-      } catch (err) {
-        // Handle error while connecting
-        console.error(err);
-      }
-    } else {
-      // Handle error if MetaMask extension is not installed
-      alert("Please install MetaMask!");
+    try {
+      // Get the web3 instance and contract instance from GetWeb3
+      const [web3, contract, accounts] = await GetWeb3();
+      // Update the state variables
+      setWeb3(web3);
+      setContract(contract);
+      setAccounts(accounts);
+      setIsConnected(true);
+      // Navigate to the VoterDashboard component
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
     }
   };
 
   const handleNav = async () => {
-    navigate("/signup");
+    navigate("/login");
   };
 
   // Render the landing page JSX
@@ -95,7 +76,7 @@ export default function LandingPage() {
           <br></br>
           <br></br>
           <br></br>
-          <div style={{margin: "10px"}}>
+          <div style={{ margin: "10px" }}>
             {isConnected ? (
               <button
                 className="btn btn-lg btn-primary margin-auto"

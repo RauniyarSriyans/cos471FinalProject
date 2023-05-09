@@ -16,58 +16,11 @@ export default function VoterDashboard() {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [ssn, setSsn] = useState(null);
 
-  // Function to connect to the Ethereum network and initialize the contract instance
-  const connectWeb3 = async () => {
-    let provider;
-
-    // Check if the user has MetaMask or another Ethereum provider installed in their browser
-    if (window.ethereum) {
-      provider = window.ethereum;
-    } else {
-      // Use a local development network as a fallback
-      provider = new Web3.providers.HttpProvider(
-        "http://127.0.0.1:7545"
-      );
-    }
-
-    // If no provider is found, log an error message and return
-    if (!provider) {
-      console.error("No Ethereum provider detected.");
-      return;
-    }
-
-    try {
-      // Create a new web3 instance using the provider
-      const web3 = new Web3(provider);
-      // Get the network ID to deploy the contract to the correct network
-      const networkId = await web3.eth.net.getId();
-      // Get the deployed network from the contract JSON
-      const deployedNetwork = Voting.networks[networkId];
-      // If the contract isn't deployed to the current network, log an error message and return
-      if (!deployedNetwork) {
-        console.error(
-          `Contract not deployed to network with ID ${networkId}`
-        );
-        return;
-      }
-      // Create a new contract instance using the web3 instance and the contract JSON
-      const contract = new web3.eth.Contract(
-        Voting.abi,
-        deployedNetwork.address
-      );
-      // Update the state with the web3 and contract instances and set isConnected to true
-      setWeb3(web3);
-      setContract(contract);
-      setIsConnected(true);
-    } catch (error) {
-      console.error("Error connecting to the Ethereum network:", error);
-    }
-  };
-
   // Function to load the list of elections from the smart contract
   async function loadElection() {
     try {
       const name = await contract.methods.getElectionName().call();
+      console.log(name);
       const electionCandidates = await contract.methods
         .getElectionCandidates()
         .call();
@@ -100,7 +53,56 @@ export default function VoterDashboard() {
 
   // Connect to the Ethereum network and initialize the contract instance on component mount
   useEffect(() => {
-    connectWeb3();
+    async function connectToWeb3() {
+      let provider;
+
+      // Check if the user has MetaMask or another Ethereum provider installed in their browser
+      if (window.ethereum) {
+        provider = window.ethereum;
+      } else {
+        // Use a local development network as a fallback
+        provider = new Web3.providers.HttpProvider(
+          "http://localhost:7545"
+        );
+      }
+
+      // If no provider is found, log an error message and return
+      if (!provider) {
+        console.error("No Ethereum provider detected.");
+        return;
+      }
+
+      try {
+        // Create a new web3 instance using the provider
+        const web3 = new Web3(provider);
+        // Get the network ID to deploy the contract to the correct network
+        const networkId = await web3.eth.net.getId();
+        // Get the deployed network from the contract JSON
+        const deployedNetwork = Voting.networks[networkId];
+        // If the contract isn't deployed to the current network, log an error message and return
+        if (!deployedNetwork) {
+          console.error(
+            `Contract not deployed to network with ID ${networkId}`
+          );
+          return;
+        }
+        // Create a new contract instance using the web3 instance and the contract JSON
+        const contract = new web3.eth.Contract(
+          Voting.abi,
+          deployedNetwork.address
+        );
+        // Update the state with the web3 and contract instances and set isConnected to true
+        setWeb3(web3);
+        setContract(contract);
+        setIsConnected(true);
+      } catch (err) {
+        // If an error occurs, log it and return
+        console.error(err);
+        return;
+      }
+    }
+
+    connectToWeb3();
   }, []);
 
   // Load the list of elections from the smart contract on component mount and whenever the contract instance changes
@@ -112,16 +114,15 @@ export default function VoterDashboard() {
 
   const handleVote = async () => {
     if (!contract || !election || selectedCandidate === null) return;
-
     try {
       const accounts = await web3.eth.getAccounts();
-      const ssn2send = web3.utils.utf8ToHex(ssn); // convert voter's SSN to bytes32 format
-      const optionIndex = selectedCandidate + 1; // candidates in the Voting contract are indexed from 1
+      const account = accounts[0];
       await contract.methods
-        .vote(ssn2send, optionIndex)
-        .send({ from: accounts[0] });
-    } catch (error) {
-      console.error("Error voting:", error);
+        .vote( localStorage.getItem("ssn"), selectedCandidate + 1)
+        .send({ from: account });
+      navigate("/results");
+    } catch (err) {
+      console.error("Error submitting vote:", err);
     }
   };
 
@@ -152,6 +153,7 @@ export default function VoterDashboard() {
                 </div>
               </div>
             </div>
+
             <div className="col-md-4">
               <div className="card mb-4">
                 <div className="card-header bg-primary text-white">
@@ -171,6 +173,21 @@ export default function VoterDashboard() {
                       </li>
                     ))}
                   </ul>
+                </div>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="card mb-4">
+                <div className="card-header bg-primary text-white">
+                  <h5 className="mb-0">Vote</h5>
+                </div>
+                <div className="card-body">
+                  <button
+                    onClick={handleVote}
+                    className="btn btn-primary"
+                  >
+                    Submit Vote
+                  </button>
                 </div>
               </div>
             </div>
