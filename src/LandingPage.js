@@ -52,7 +52,7 @@ export default function LandingPage() {
   };
 
   const handleNav = async () => {
-    navigate("/login");
+    navigate("/signup");
   };
 
   // Render the landing page JSX
@@ -95,21 +95,23 @@ export default function LandingPage() {
           <br></br>
           <br></br>
           <br></br>
-          {isConnected ? (
-            <button
-              className="btn btn-lg btn-primary margin-auto"
-              onClick={handleNav}
-            >
-              Signup/Login
-            </button>
-          ) : (
-            <button
-              className="btn btn-lg btn-success margin-auto"
-              onClick={handleConnect}
-            >
-              Connect
-            </button>
-          )}
+          <div style={{margin: "10px"}}>
+            {isConnected ? (
+              <button
+                className="btn btn-lg btn-primary margin-auto"
+                onClick={handleNav}
+              >
+                Signup/Login
+              </button>
+            ) : (
+              <button
+                className="btn btn-lg btn-success margin-auto"
+                onClick={handleConnect}
+              >
+                Connect
+              </button>
+            )}
+          </div>
         </div>
       </main>
       <footer className="bg-success text-white text-center py-3">
