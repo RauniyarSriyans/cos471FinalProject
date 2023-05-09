@@ -26,11 +26,9 @@ export const Login = (props) => {
       // Use a local development network as a fallback
       provider = new Web3.providers.HttpProvider(
         "http://127.0.0.1:7545"
-        
       );
       console.log("here2");
     }
-
     // If no provider is found, log an error message and return
     if (!provider) {
       console.error("No Ethereum provider detected.");
@@ -91,7 +89,7 @@ export const Login = (props) => {
         error = 1;
         
     }
-    else if (isRegistered) {
+    else if (!isRegistered) {
         setErrorMessage("Unregistered SSN. Please sign up");
         error = 1;
         console.log(errorMessage);

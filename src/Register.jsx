@@ -12,6 +12,7 @@ export const Register = (props) => {
       const [ssn, setSSN] = useState("");
       const [web3, setWeb3] = useState(null);
       const [contract, setContract] = useState(null);
+      const [accounts, setAccounts] = useState([]);
       const [isConnected, setIsConnected] = useState(false);
     
     
@@ -57,9 +58,11 @@ export const Register = (props) => {
             Voting.abi,
             deployedNetwork.address
           );
+          const accounts = await web3.eth.getAccounts()
           // Update the state with the web3 and contract instances and set isConnected to true
           setWeb3(web3);
           setContract(contract);
+          setAccounts(accounts);
           setIsConnected(true);
         } catch (error) {
           console.error("Error connecting to the Ethereum network:", error);
@@ -69,14 +72,13 @@ export const Register = (props) => {
         connectWeb3();
       }, []);
       const failureCallBack = (error)=>{
-         setErrorMessage(error);
-         setShowErrorMsg(true);
          console.log("error");
         }
-        const successCallBack = ()=>{
+        const successCallBack = async (Name, DOB, SSN)=>{
           console.log("success");
           setShowErrorMsg(false);
           setErrorMessage(null);
+          await contract.methods.register(Name,DOB, SSN).send({from: accounts[0]});
           navigate("/dashboard");
 
         }
@@ -89,14 +91,17 @@ export const Register = (props) => {
         const enteredDate = e.target.dob.value;
         if (!/^\d{3}-\d{2}-\d{4}$/.test(enteredSSN)) {
             document.getElementById('ssn').placeholder = "Invalid SNN";
+            setErrorMessage("Please fix errors above.")
             error = 1;
         }
         if (enteredName === ""){
             document.getElementById('name').placeholder = "Name field cannot be empty";
+            setErrorMessage("Please fix errors above.")
             error = 1;
         }
         if (enteredDate === "") {
             document.getElementById('dob').placeholder = "Date of birth field cannot be empty";
+            setErrorMessage("Please fix errors above.");
             error = 1;
         }
         const isRegistered = await contract.methods.hasRegistered(enteredSSN).call();
@@ -106,7 +111,7 @@ export const Register = (props) => {
           console.log(errorMessage);
         }
 
-        error !== 0 ? failureCallBack("Please fix errors above") : successCallBack()
+        error !== 0 ? failureCallBack(errorMessage) : successCallBack(enteredName, enteredDate, enteredSSN);
 
       }
         
