@@ -23,7 +23,6 @@ export const Register = (props) => {
         setWeb3(web3);
         setContract(contract);
         setAccounts(accounts);
-  
       } catch (err) {
         console.error(err);
       }
@@ -68,7 +67,9 @@ export const Register = (props) => {
       } else {
         await contract.methods
           .register(enteredName, enteredDate, enteredSSN)
-          .send({ from: accounts[0] });
+          .send({ from: accounts[0], gas: 6721975 });
+
+        localStorage.setItem("ssn", enteredSSN);
         navigate("/dashboard");
       }
     } catch (error) {

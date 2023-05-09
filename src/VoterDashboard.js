@@ -15,7 +15,7 @@ export default function VoterDashboard() {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [ssn, setSsn] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState(null);
   // Function to load the list of elections from the smart contract
   async function loadElection() {
     try {
@@ -114,14 +114,20 @@ export default function VoterDashboard() {
 
   const handleVote = async () => {
     if (!contract || !election || selectedCandidate === null) return;
+    if (localStorage.getItem("ssn") === null) {
+      setErrorMessage("Please enter your SSN by loging in again.");
+      return;
+    }
+
     try {
       const accounts = await web3.eth.getAccounts();
       const account = accounts[0];
       await contract.methods
-        .vote( localStorage.getItem("ssn"), selectedCandidate + 1)
+        .vote(localStorage.getItem("ssn"), selectedCandidate + 1)
         .send({ from: account });
       navigate("/results");
     } catch (err) {
+      setErrorMessage("You have already voted for this election.");
       console.error("Error submitting vote:", err);
     }
   };
@@ -188,6 +194,15 @@ export default function VoterDashboard() {
                     Submit Vote
                   </button>
                 </div>
+              </div>
+            </div>
+            <div className="col-md-4">
+              <div className="mb-4">
+                {errorMessage && (
+                  <div className="alert alert-danger" role="alert">
+                    {errorMessage}
+                  </div>
+                )}
               </div>
             </div>
           </div>

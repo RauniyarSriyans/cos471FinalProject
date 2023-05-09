@@ -49,7 +49,6 @@ export const Login = (props) => {
       if (!isRegistered) {
         throw new Error("Unregistered SSN. Please sign up.");
       }
-      localStorage.setItem("ssn", enteredSSN);
       navigate("/dashboard");
     } catch (err) {
       // If an error occurs, set the error message and show the error component
