@@ -91,7 +91,7 @@ export const Login = (props) => {
         error = 1;
         
     }
-    else if (!isRegistered) {
+    else if (isRegistered) {
         setErrorMessage("Unregistered SSN. Please sign up");
         error = 1;
         console.log(errorMessage);
@@ -105,7 +105,7 @@ export const Login = (props) => {
         <>
         <form onSubmit={handleSubmit}>
             <label>SSN</label>
-            <input value = {ssn} onChange = {(e) => setSSN(e.target.value)}type="password" placeholder="Please enter your SSN" id="ssn" name="ssn" />
+            <input value = {ssn} onChange = {(e) => setSSN(e.target.value)}type="text" placeholder="Please enter your SSN" id="ssn" name="ssn" />
             <button type = "submit">Log In</button>
             {errorMessage && <p>{errorMessage}</p>}
         </form>

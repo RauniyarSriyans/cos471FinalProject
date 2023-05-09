@@ -118,7 +118,7 @@ export const Register = (props) => {
             <label>Date of Birth</label>
             <input value = {date}onChange = {(e) => setDate(e.target.value)}type="date" placeholder="Date of Birth" id="dob" name="dob" />
             <label>SSN</label>
-            <input value = {ssn} onChange = {(e) => setSSN(e.target.value)}type="password" placeholder="SSN" id="ssn" name="ssn" />
+            <input value = {ssn} onChange = {(e) => setSSN(e.target.value)}type="text" placeholder="SSN" id="ssn" name="ssn" />
             <button type = "submit">Sign up</button>
             {errorMessage && <p>{errorMessage}</p>}
         </form>
