@@ -94,6 +94,9 @@ export default function Results() {
 
     loadResults();
   }, [contract]);
+  const handleDeVoteClick = async () => {
+    navigate("/");
+  };
 
 
   const handleLogout = async () => {
@@ -105,7 +108,7 @@ export default function Results() {
     <div className="bg-light d-flex flex-column min-vh-100">
       <header className="bg-success text-white">
         <div className="container d-flex justify-content-between align-items-center py-3">
-          <h2 className="mb-0">DeVote</h2>
+        <button onClick = {handleDeVoteClick} className="btn btn-lg btn-success margin-auto">DeVote</button> 
           <h2 className="mb-0">A COS471 Project</h2>
         </div>
       </header>
@@ -124,7 +127,7 @@ export default function Results() {
                 <p className="card-text">
                   {candidates[2]}: {candidatesVotes[2]} votes
                 </p>
-                <button onClick={() => {navigate("/")}} className="btn btn-primary mr-9"
+                <button onClick={() => {navigate("/dashboard")}} className="btn btn-primary mr-9"
                 style={{margin: "10px"}}>
                   Return to Dashboard
                 </button>

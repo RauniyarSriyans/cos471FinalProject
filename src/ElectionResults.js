@@ -127,6 +127,7 @@ export default function ElectionResults() {
   // Render the landing page JSX
   return (
     <div style={{ textAlign: "center" }}>
+      
     <h1>Election Results</h1>
     <div className="App">
       <PieChart width={500} height={800}>
