@@ -46,7 +46,7 @@
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const infuraID = "1588403df45d42edb3e1741867dbcad1";
-const mnemonic = "lady fat close humor accuse enter head gym alter talk jaguar swap";
+const mnemonic = "nope this is not public";
 
 module.exports = {
   /**
